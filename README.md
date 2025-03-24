@@ -34,19 +34,19 @@ or if you have an **environmental variable** `CI` with value set to `true` then 
 
 However, using the `run` command you can specify any command which you want to run in case your dependencies have changed since the last run.
 
-```
+```shell
 npx package-changed run "echo 'Run any command when your package has changed'"
 ```
 
 #### All CLI options
 
-**package-changed**
+-   **package-changed**
 
-```
+```shell
 Options:
   --cwd [cwd]                 Current working directory.
   --hash-filename [filename]  Filename where hash of dependencies will be written to
-  --lockfile                  Include package versions from package-lock.json in hash
+  --no-lockfile               Skip calculating hash from lockfile
   --no-hash-file              Skip writing new hash to .packagehash file
   -h, --help                  display help for command
 
@@ -56,9 +56,9 @@ Commands:
   help [command]              display help for command
 ```
 
-**package-changed install**
+-   **package-changed install**
 
-```
+```shell
 Usage: package-changed install [options]
 
 Options:
@@ -67,9 +67,9 @@ Options:
   -h, --help  display help for command
 ```
 
-**package-changed run**
+-   **package-changed run**
 
-```
+```shell
 Usage: package-changed run [options] [command]
 
 Options:
@@ -77,7 +77,6 @@ Options:
 ```
 
 #### Use git hooks to run **package-changed** automatically
-
 
 **package-changed** can be run automatically with git hooks, for example: when switching branches. [Husky](https://github.com/typicode/husky) is a popular choice for configuring git hooks.
 
@@ -89,7 +88,6 @@ npx husky add .husky/post-merge "npx --no package-changed"
 npx husky add .husky/post-rebase "npx --no package-changed"
 ```
 
-
 ### Javascript API
 
 ```javascript
@@ -100,6 +98,7 @@ isPackageChanged(
 ```
 
 #### Example usage
+
 ```javascript
 const {
   isPackageChanged
@@ -128,7 +127,7 @@ if (isChanged) {
 // or use the callback argument
 isPackageChanged(
   undefined, // using default options
-  ({isChanged}) => {
+  ({isChanged, pm}) => {
     // ...
 
     return true; // or false if you don't want the hash to be written
@@ -136,30 +135,30 @@ isPackageChanged(
 );
 ```
 
-**PackageChangedOptions**
-| Property      | Type    | Description                                             | Required | Default          |
-| ------------- | ------- | ------------------------------------------------------- | -------- | ---------------- |
-| cwd           | string  | Current working directory                               | false    | `process.cwd()`  |
-| hashFilename  | string  | Filename where hash of dependencies will be written to. | false    | `'.packagehash'` |
-| lockfile      | boolean | Include package-lock.json content in hash.              | false    | `false`          |
-| noHashFile    | boolean | Skip writing new hash to .packagehash file.              | false    | `false`          |
+-   **PackageChangedOptions**
 
+| Property     | Type    | Description                                             | Required | Default          |
+| ------------ | ------- | ------------------------------------------------------- | -------- | ---------------- |
+| cwd          | string  | Current working directory                               | false    | `process.cwd()`  |
+| hashFilename | string  | Filename where hash of dependencies will be written to. | false    | `'.packagehash'` |
+| noLockfile   | boolean | Skip calculating hash from lockfile.                    | false    | `false`          |
+| noHashFile   | boolean | Skip writing new hash to .packagehash file.             | false    | `false`          |
 
-**PackageChangedCallbackResult**
-| Property  | Type                | Description                                                                       |
-| --------- | ------------------- | --------------------------------------------------------------------------------- |
-| isChanged | boolean             | Filename where hash of dependencies will be written to.                           |
-| hash      | string              | The hash for the current listed dependencies in `package.json`                    |
-| oldHash   | string \| undefined | The hash used to compare newHash with. `undefined` if no previous hash was found. |
+-   **PackageChangedCallbackResult**
 
+| Property  | Type                | Description                                                                                                              |
+| --------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| isChanged | boolean             | Filename where hash of dependencies will be written to.                                                                  |
+| hash      | string              | The hash for the current listed dependencies in `package.json`                                                           |
+| oldHash   | string \| undefined | The hash used to compare newHash with. `undefined` if no previous hash was found.                                        |
+| pm        | object \| null      | An object with the properties `name` and `version` representing the detected package manager. `null` if detection fails. |
 
-**PackageChangedResult**
-| Property  | Type                | Description                                                                       |
-| --------- | ------------------- | --------------------------------------------------------------------------------- |
-| isChanged | boolean             | Filename where hash of dependencies will be written to.                           |
-| hash      | string              | The hash for the current listed dependencies in `package.json`                    |
-| oldHash   | string \| undefined | The hash used to compare newHash with. `undefined` if no previous hash was found. |
-| writeHash | function            | Function which needs to be called after the cache has been succesfully restored.  |
+-   **PackageChangedResult**
 
-
-
+| Property  | Type                | Description                                                                                                              |
+| --------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| isChanged | boolean             | Filename where hash of dependencies will be written to.                                                                  |
+| hash      | string              | The hash for the current listed dependencies in `package.json`                                                           |
+| oldHash   | string \| undefined | The hash used to compare newHash with. `undefined` if no previous hash was found.                                        |
+| pm        | object \| null      | An object with the properties `name` and `version` representing the detected package manager. `null` if detection fails. |
+| writeHash | function            | Function which needs to be called after the cache has been successfully restored.                                        |
